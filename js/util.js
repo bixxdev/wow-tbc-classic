@@ -1,3 +1,6 @@
+/**
+ * Used to display auction costs in gold, silver, copper
+ */
 function reverse(str) {
     if (str === "")
         return "";
