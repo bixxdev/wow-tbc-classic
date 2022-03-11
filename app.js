@@ -43,7 +43,7 @@ app.route("/")
         https.get(itemURL, response => {
             switch (response.statusCode) {
                 case 200:
-                    console.log(`items: ${response.statusCode}`);
+                    console.log(`GET ITEM INFO ${response.statusCode}`);
                     let body = '';
                     response.on("data", function(data){
                         body += data;
@@ -54,10 +54,10 @@ app.route("/")
                     });
                     break;
                 case 401:
-                    console.log(`items: ${response.statusCode}: renew access_token`);
+                    console.log(`GET ITEM INFO ${response.statusCode}: renew access_token`);
                     break;
                 default:
-                    console.log(`items: ${response.statusCode}`);
+                    console.log(`GET ITEM INFO ${response.statusCode}`);
             }
         })
 
@@ -65,7 +65,7 @@ app.route("/")
         https.get(auctionURL, response => {
             switch (response.statusCode) {
                 case 200:
-                    console.log(`auctions: ${response.statusCode}`);
+                    console.log(`GET AUCTION INFO ${response.statusCode}`);
                     
                     let body = '';
                     response.on("data", function(data){
@@ -95,9 +95,9 @@ app.route("/")
                         //sort by quantity + buyout
                         auctions.sort((a, b) => (a.quantity > b.quantity) ? 1 : (a.quantity === b.quantity) ? ((a.buyout > b.buyout) ? 1 : -1) : -1 )
                         auctions.forEach((auction,i) => {
-                            //res.write("ID: " + auction.item.id + " ");
-                            //res.write("Buyout: " + auction.buyout + " ");
-                            //res.write("Quantity: " + auction.quantity+"\n");
+                            res.write("ID: " + auction.item.id + " ");
+                            res.write("Buyout: " + auction.buyout + " ");
+                            res.write("Quantity: " + auction.quantity+"\n");
                             let auction_buyout = JSON.stringify(auction.buyout);
                             //reverse buyout to prettify
                             auction_buyout = util.reverse(auction_buyout);
@@ -106,23 +106,19 @@ app.route("/")
                             const silver = util.reverse(auction_buyout.slice(2,4));
                             const copper = util.reverse(auction_buyout.slice(0,2));
 
-                            /* res.write(`
-                                <p style="margin:0">
-                                    (${auction.quantity}): ${gold}g ${silver} ${copper}
-
-                                </p>
-                            `); */
+                            res.write(`(${auction.quantity}): ${gold}g ${silver}s ${copper}c \n`);
                         });
                         // res.write(`<p>${count_auctions} Auktionen</p>`);
-                        // res.send();
+                        res.send();
                     });
-                    res.sendFile(path.join(__dirname+'/html/showAuction.html'));
+                    //redirect to another html file
+                    //res.sendFile(path.join(__dirname+'/html/showAuction.html'));
                     break;
                 case 401:
-                    console.log(`auctions: ${response.statusCode}: renew access_token`);
+                    console.log(`GET AUCTION INFO ${response.statusCode}: renew access_token`);
                     break;
                 default:
-                    console.log(`auctions: ${response.statusCode}`);
+                    console.log(`GET AUCTION INFO ${response.statusCode}`);
             }
 
         }).on('error', function(e){
@@ -133,9 +129,6 @@ app.route("/")
 
 /*
 router.get("/", function(req,res){
-
-    
-    
     //res.send("Server is running.");
     //res.sendFile(path.join(__dirname+'/html/index.html'));
 })
