@@ -1,42 +1,102 @@
 /**
  * Teufelslotus: 22794
  */
-//required imports
+// required imports
 const https = require("https");
 const express = require("express");
 const app = express();
-//additional imports
+// additional imports
 const path = require("path");
 const router = express.Router();
-//dotenv file
-require('dotenv').config()
-const accessToken = process.env.TOKEN;
-//Form Input
+// dotenv file, access_token
+//require('dotenv').config()
+//const clientId = process.env.CLIENTID;
+//const clientSecret = process.env.CLIENTSECRET;
+//const accessToken = process.env.TOKEN;
+//let accessToken;
+        require('dotenv').config()
+        const clientId = process.env.CLIENTID;
+        const clientSecret = process.env.CLIENTSECRET;
+        var accessToken = '0';
+const request = require('request');
+// Form Input
 const bodyParser = require("body-parser");
 const { raw } = require("body-parser");
 const { rawListeners } = require("process");
 const { response } = require("express");
 app.use(bodyParser.urlencoded({extended:true}));
 
-//custom imports
+// custom imports
 const util = require("./js/util.js");
 
+// ejs
+app.set("view engine", "ejs");
 
 app.route("/")
     .get( (req,res) => {
-        res.sendFile(path.join(__dirname+'/html/index.html'));
+        //res.sendFile(path.join(__dirname+'/html/index.html'));
+        res.render('index');
+
+
+        console.log('imported initial token variable: '+accessToken);
+        // get access token
+        //let accessToken = '';
+        let body = 'grant_type=client_credentials';
+        let options = {
+            url: 'https://us.battle.net/oauth/token',
+            method: 'POST',
+            headers: {
+                "content-type": "application/x-www-form-urlencoded" // added to encode body string
+            },
+            body: body,
+            auth: {
+                'user': clientId,
+                'pass': clientSecret
+            }
+        };
+        function callback(error, response, body) {
+
+            if (!error && response.statusCode == 200) {
+                //console.log(`callback: ${response.statusCode}, ${body}`);
+                let parsed_body = JSON.parse(body);
+                accessToken = parsed_body.access_token;
+                console.log(`_callback Token: ${accessToken}`);
+            } 
+            else { 
+                console.log(response.statusCode, body);
+            }
+    
+    }
+          //request(util.options, util.callback);
+          console.log(request(options, callback))
+          console.log(accessToken);
+          //console.log('___________________ request accesstoken: '+util.accessToken)
+          //accessToken = util.accessToken;
+          //console.log(accessToken);
+
+
+
+
+
+
+
+
+
+
+        
     })
     .post( (req,res) => {
-                
+        console.log(accessToken);
         const server = "4745"; //Transcendence
         const auctionhouse = "6"; //A:2, H:6, S:7
         const namespace_dynamic = "dynamic-classic-eu";
         const namespace_static = "static-classic-eu";
         const locale = "de_DE";
-        const auctionURL = `https://eu.api.blizzard.com/data/wow/connected-realm/${server}/auctions/${auctionhouse}?namespace=${namespace_dynamic}&locale=${locale}&access_token=${accessToken}`;
+        const auctionURL = `https://eu.api.blizzard.com/data/wow/connected-realm/${server}/auctions/${auctionhouse}?namespace=${namespace_dynamic}&locale=${locale}&access_token=${util.accessToken}`;
+        console.log('post "/", access_token ' + util.accessToken);
         
         const item_ID = parseInt(req.body.itemID, 10); // FormInput: parseInt für eine exakte Typenabfrage im Array/Objekt
-        const itemURL = `https://eu.api.blizzard.com/data/wow/item/${item_ID}?namespace=${namespace_static}&locale=${locale}&access_token=${accessToken}`;
+        const itemURL = `https://eu.api.blizzard.com/data/wow/item/${item_ID}?namespace=${namespace_static}&locale=${locale}&access_token=${util.accessToken}`;
         let item_name;
                         
         // GET ITEM INFO
@@ -55,6 +115,7 @@ app.route("/")
                     break;
                 case 401:
                     console.log(`GET ITEM INFO ${response.statusCode}: renew access_token`);
+                    console.log(`**** CURRENT ACCESS_TOKEN: ${util.accessToken}`);
                     break;
                 default:
                     console.log(`GET ITEM INFO ${response.statusCode}`);
@@ -109,7 +170,11 @@ app.route("/")
                             res.write(`(${auction.quantity}): ${gold}g ${silver}s ${copper}c \n`);
                         });
                         // res.write(`<p>${count_auctions} Auktionen</p>`);
-                        res.send();
+                        // comment out res.send() for ending write / infinite page loading
+                        //res.send();
+                        res.render('show', {
+                            auctions: auctions
+                        });
                     });
                     //redirect to another html file
                     //res.sendFile(path.join(__dirname+'/html/showAuction.html'));
