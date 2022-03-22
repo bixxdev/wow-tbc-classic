@@ -1,7 +1,7 @@
 /**
  * Used to display auction costs in gold, silver, copper
  */
-function reverse(str) {
+reverse = (str) => {
     if (str === "")
         return "";
     else
