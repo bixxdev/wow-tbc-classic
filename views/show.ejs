@@ -5,31 +5,51 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
+    <script src="/js/functions.js"></script>
 </head>
 <body>
     
-<h1>Show</h1>
-
-<!-- 
-
-
-auctions.forEach((auction,i) => {
-    res.write("ID: " + auction.item.id + " ");
-    res.write("Buyout: " + auction.buyout + " ");
-    res.write("Quantity: " + auction.quantity+"\n");
-    let auction_buyout = JSON.stringify(auction.buyout);
-    //reverse buyout to prettify
-    auction_buyout = util.reverse(auction_buyout);
-    //reverse again to display correct number
-    const gold = util.reverse(auction_buyout.slice(4));
-    const silver = util.reverse(auction_buyout.slice(2,4));
-    const copper = util.reverse(auction_buyout.slice(0,2));
-
-    res.write(`(${auction.quantity}): ${gold}g ${silver}s ${copper}c \n`);
-});
-
-
--->
+<h1><%= item_name %></h1>
+<script>
+    let cost;
+</script>
+<table>
+<% 
+reverse = (str) => {
+    if (str === "")
+        return "";
+    else
+        return reverse(str.substr(1)) + str.charAt(0);
+}
+    let cost; 
+    auctions.forEach(function(auction){
+%>
+<tr>
+    <td><%= auction.quantity %></td>
+                    <%
+                    let auction_buyout = JSON.stringify(auction.buyout);
+                    let auction_buyout_single =  JSON.stringify(Math.floor(auction_buyout / auction.quantity));
+                    let gold,silver,copper,gold_single,silver_single,copper_single;
+                    if(auction_buyout > 0) {
+                        if(auction.quantity > 1){
+                            auction_buyout_single = reverse(auction_buyout_single);
+                            gold_single = reverse(auction_buyout_single.slice(4));
+                            silver_single = reverse(auction_buyout_single.slice(2,4));
+                            copper_single = reverse(auction_buyout_single.slice(0,2));
+                        }
+                        auction_buyout = reverse(auction_buyout);
+                        gold = reverse(auction_buyout.slice(4)); 
+                        silver = reverse(auction_buyout.slice(2,4)); 
+                        copper = reverse(auction_buyout.slice(0,2)); 
+                    %>
+                    <td><%= gold %>g <%= silver %>s <%= copper %>c</td>
+                    <% if(auction.quantity > 1){ %>
+                    <td><%= gold_single %>g <%= silver_single %>s <%= copper_single %>c</td>
+                    <% } %>
+        <% } %>
+</tr>
+<% }) %>
+</table>
 
 </body>
 </html>

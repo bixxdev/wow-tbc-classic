@@ -20,16 +20,20 @@
 /* custom imports */
     const util = require("./js/util.js");
 /* ejs */
-    //app.set("view engine", "ejs");
+    app.set("view engine", "ejs");
 /* axios, renew token */
     const axios = require("axios");
+
+/** js ordner bereitstellen */
+app.use('/js', express.static(__dirname + '/js'));
+
 
 
 app.route("/")
     .get( (req,res) => {
-        res.sendFile(path.join(__dirname+'/html/index.html'));
+        //res.sendFile(path.join(__dirname+'/html/index.html'));
         /** ejs */
-        //res.render('index');//ejs
+        res.render('index');
     })
     .post( (req,res) => {
 
@@ -42,6 +46,7 @@ app.route("/")
         let auctionURL;
         let itemURL;
         let access_token;
+        let auctions;
         let item_name;
 
         axios.request({
@@ -74,12 +79,10 @@ app.route("/")
                         response.on('end', function(){
                             const parsedResponse = JSON.parse(body);
                             item_name = parsedResponse.name;
-                            res.write(`${item_name} \n\n`);
                         });
                         break;
                     case 401:
                         console.log(`GET ITEM INFO ${response.statusCode}: renew access_token`);
-                        //console.log(`**** CURRENT ACCESS_TOKEN: ${util.accessToken}`);
                         break;
                     default:
                         console.log(`GET ITEM INFO ${response.statusCode}`);
@@ -98,7 +101,7 @@ app.route("/")
                         })
                         response.on('end', function(){
                             const parsedResponse = JSON.parse(body);
-                            let auctions = parsedResponse.auctions;
+                            auctions = parsedResponse.auctions;
                             let count_auctions= 0;
                             let count_items = 0;
                             
@@ -110,36 +113,30 @@ app.route("/")
                             count_auctions = auctions.length;
                             count_items = auctions.map(i=>i.quantity).reduce((a,b)=>a+b);
                             
-                            /* res.write(`
-                                <h1>${item_name} (${count_items})</h1>
-                            `); */
-                            
-                            //console.log(auctions);
-                            //console.log(`Anzahl Auktionen von ${item_ID}: ${count_auctions}`);
-                            //console.log(`Anzahl von ${item_ID}: ${count_items}`);
                             /** sort by quantity + buyout */
                             auctions.sort((a, b) => (a.quantity > b.quantity) ? 1 : (a.quantity === b.quantity) ? ((a.buyout > b.buyout) ? 1 : -1) : -1 )
                             auctions.forEach((auction,i) => {
-                                res.write("ID: " + auction.item.id + " ");
-                                res.write("Buyout: " + auction.buyout + " ");
-                                res.write("Quantity: " + auction.quantity+"\n");
-                                let auction_buyout = JSON.stringify(auction.buyout);
-                                /** reverse buyout to prettify */
-                                auction_buyout = util.reverse(auction_buyout);
-                                /** reverse again to display correct number */
-                                const gold = util.reverse(auction_buyout.slice(4));
-                                const silver = util.reverse(auction_buyout.slice(2,4));
-                                const copper = util.reverse(auction_buyout.slice(0,2));
+                                //res.write("ID: " + auction.item.id + " ");
+                                //res.write("Buyout: " + auction.buyout + " ");
+                                //res.write("Quantity: " + auction.quantity+"\n");
+                                    //let auction_buyout = JSON.stringify(auction.buyout);
+                                    /** reverse buyout to prettify */
+                                    //auction_buyout = util.reverse(auction_buyout);
+                                    /** reverse again to display correct number */
+                                    //const gold = util.reverse(auction_buyout.slice(4));
+                                    //const silver = util.reverse(auction_buyout.slice(2,4));
+                                    //const copper = util.reverse(auction_buyout.slice(0,2));
         
-                                res.write(`(${auction.quantity}): ${gold}g ${silver}s ${copper}c \n`);
+                                //res.write(`(${auction.quantity}): ${gold}g ${silver}s ${copper}c \n`);
                             });
                             // res.write(`<p>${count_auctions} Auktionen</p>`);
                             /** comment out res.send() for ending write / infinite page loading (ejs?) */
-                            res.send();
-                            /** ejs */
-                            //res.render('show', {
-                            //    auctions: auctions
-                            //});
+                            //res.send();
+                            /** ejs, comment out res.write() and res.send() */
+                            res.render('show', {
+                                auctions: auctions,
+                                item_name: item_name,
+                            });
                         });
                         /** redirect to another html file */
                         //res.sendFile(path.join(__dirname+'/html/showAuction.html'));
@@ -159,7 +156,7 @@ app.route("/")
             console.log("___________________ AXIOS END ___________________");
         })
         .catch(function (error) {
-            console.log(error);
+            console.log("catch "+error);
         }); /** end axios then */
         console.log("post end");
     })
