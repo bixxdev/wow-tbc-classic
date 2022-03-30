@@ -6,14 +6,25 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Document</title>
     <script src="/js/functions.js"></script>
+    <style>
+        table {
+            text-align: right;
+        }
+    </style>
 </head>
 <body>
-    
+<p style="font-style:italic">Letztes Update: <%= lastModified %></p>
 <h1><%= item_name %></h1>
 <script>
     let cost;
 </script>
 <table>
+    <tr><td>Lowest price: </td><td><%= lowestAuction[0].singleBuyout %></td></tr>
+    <tr><td>Total price: </td><td><%= lowestAuction[0].buyout %></td></tr>
+    <tr><td>Quantity: </td><td><%= lowestAuction[0].quantity %></td></tr>
+    <tr><td>Number of Auctions: </td><td><%= lowestAuction.length %></td></tr>
+    <tr><td><hr></td></tr>
+    <tr><td>Quantity</td><td>buyout</td><td>single buyout</td></tr>
 <% 
 reverse = (str) => {
     if (str === "")
@@ -22,7 +33,7 @@ reverse = (str) => {
         return reverse(str.substr(1)) + str.charAt(0);
 }
     let cost; 
-    auctions.forEach(function(auction){
+    auctionsReduced.forEach(function(auction){
 %>
 <tr>
     <td><%= auction.quantity %></td>
@@ -31,21 +42,21 @@ reverse = (str) => {
                     let auction_buyout_single =  JSON.stringify(Math.floor(auction_buyout / auction.quantity));
                     let gold,silver,copper,gold_single,silver_single,copper_single;
                     if(auction_buyout > 0) {
-                        if(auction.quantity > 1){
+
                             auction_buyout_single = reverse(auction_buyout_single);
                             gold_single = reverse(auction_buyout_single.slice(4));
                             silver_single = reverse(auction_buyout_single.slice(2,4));
                             copper_single = reverse(auction_buyout_single.slice(0,2));
-                        }
+
                         auction_buyout = reverse(auction_buyout);
                         gold = reverse(auction_buyout.slice(4)); 
                         silver = reverse(auction_buyout.slice(2,4)); 
                         copper = reverse(auction_buyout.slice(0,2)); 
                     %>
                     <td><%= gold %>g <%= silver %>s <%= copper %>c</td>
-                    <% if(auction.quantity > 1){ %>
+
                     <td><%= gold_single %>g <%= silver_single %>s <%= copper_single %>c</td>
-                    <% } %>
+
         <% } %>
 </tr>
 <% }) %>

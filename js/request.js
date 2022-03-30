@@ -1,4 +1,4 @@
-
+const util = require(__dirname + "/util.js");
 
 let requestAuctions = (req,res,https,axios,clientId,clientSecret) => {
 
@@ -11,8 +11,9 @@ let requestAuctions = (req,res,https,axios,clientId,clientSecret) => {
         let auctionURL;
         let itemURL;
         let access_token;
-        let auctions;
         let item_name;
+        let auctions;
+        let auctionsReduced = [];
 
         axios.request({
             url: "https://us.battle.net/oauth/token",
@@ -59,6 +60,8 @@ let requestAuctions = (req,res,https,axios,clientId,clientSecret) => {
             https.get(auctionURL, response => {
                 switch (response.statusCode) {
                     case 200:
+
+                        let lastModified = util.convertDate(response.headers['last-modified']);
                         console.log(`GET AUCTION INFO ${response.statusCode}`);
                         let body = '';
                         response.on("data", function(data){
@@ -93,7 +96,37 @@ let requestAuctions = (req,res,https,axios,clientId,clientSecret) => {
                                     //const copper = util.reverse(auction_buyout.slice(0,2));
         
                                 //res.write(`(${auction.quantity}): ${gold}g ${silver}s ${copper}c \n`);
+
+                                /** buyout / quantity */
+                                let result = auction.buyout / auction.quantity;
+                                //console.log("b/q: " + Math.floor(result));
+                                let auc = {};
+                                auc.itemId = auction.item.id;
+                                auc.buyout = auction.buyout;
+                                auc.quantity = auction.quantity;
+                                auc.singleBuyout = result;
+                                auctionsReduced.push(auc);
                             });
+                            
+                            /** get lowest singlebuyout */
+                             // There's no real number bigger than plus Infinity
+                                var lowest = Number.POSITIVE_INFINITY;
+                                //var highest = Number.NEGATIVE_INFINITY;
+                                var tmp;
+                                for (var i=auctionsReduced.length-1; i>=0; i--) {
+                                    tmp = auctionsReduced[i].singleBuyout;
+                                    if (tmp < lowest) lowest = tmp;
+                                    //if (tmp > highest) highest = tmp;
+                                }
+                                //console.log(lowest);
+                                let lowestAuction = auctionsReduced.filter(a => {
+                                    return a.singleBuyout === lowest
+                                  })
+                                //console.log(lowestAuction);
+                                auctionsReduced.sort((a,b) => (a.singleBuyout > b.singleBuyout) ? 1 : ((b.singleBuyout > a.singleBuyout) ? -1 : 0));
+                                //console.log(auctionsReduced);
+
+
                             // res.write(`<p>${count_auctions} Auktionen</p>`);
                             /** comment out res.send() for ending write / infinite page loading (ejs?) */
                             //res.send();
@@ -101,6 +134,9 @@ let requestAuctions = (req,res,https,axios,clientId,clientSecret) => {
                             res.render('show', {
                                 auctions: auctions,
                                 item_name: item_name,
+                                auctionsReduced: auctionsReduced,
+                                lowestAuction: lowestAuction,
+                                lastModified: lastModified,
                             });
                         });
                         /** redirect to another html file */
