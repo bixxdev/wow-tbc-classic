@@ -11,7 +11,14 @@ reverse = (str) => {
 //    console.log(g+"g "+s+"s "+c+"c");
 //}
 
+/** Convert time of latest data modification from api */
+convertDate = (date) => {
+    let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'};
+    return new Date(date).toLocaleString("de-DE", options);
+}
+
 module.exports = { 
     reverse,
     //price
+    convertDate,
 };
