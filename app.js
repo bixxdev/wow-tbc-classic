@@ -1,4 +1,3 @@
-/** Teufelslotus: 22794 */
 /* required imports */
     const https = require("https");
     const express = require("express");
