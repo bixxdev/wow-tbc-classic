@@ -8,6 +8,14 @@ let requestAuctions = (req,res,https,axios,clientId,clientSecret) => {
         const namespace_static = "static-classic-eu";
         const locale = "de_DE";
         const item_ID = parseInt(req.body.itemID, 10); // FormInput: parseInt für eine exakte Typenabfrage im Array/Objekt
+        const alchemy_IDs = [22794,22793,28590,22791,28588,22786,28587,22790,28589,22789,28591,22792]; // reference @ ids.txt
+        /** 
+         * TODO:
+         * 1. array of objects über GET ITEM INFO
+         * 2. auctions reduce auf alchemy_IDs
+         * 3. ...
+         * zusätzlich: wird Unterschied von auctions und auctionsReduces benötigt? reicht nicht auctions und Überschreiben von auctions aus?
+         */
         let auctionURL;
         let itemURL;
         let access_token;
@@ -87,45 +95,32 @@ let requestAuctions = (req,res,https,axios,clientId,clientSecret) => {
                                 //res.write("ID: " + auction.item.id + " ");
                                 //res.write("Buyout: " + auction.buyout + " ");
                                 //res.write("Quantity: " + auction.quantity+"\n");
-                                    //let auction_buyout = JSON.stringify(auction.buyout);
-                                    /** reverse buyout to prettify */
-                                    //auction_buyout = util.reverse(auction_buyout);
-                                    /** reverse again to display correct number */
-                                    //const gold = util.reverse(auction_buyout.slice(4));
-                                    //const silver = util.reverse(auction_buyout.slice(2,4));
-                                    //const copper = util.reverse(auction_buyout.slice(0,2));
-        
-                                //res.write(`(${auction.quantity}): ${gold}g ${silver}s ${copper}c \n`);
 
-                                /** buyout / quantity */
+                                /** buyout divided by quantity */
                                 let result = auction.buyout / auction.quantity;
-                                //console.log("b/q: " + Math.floor(result));
                                 let auc = {};
                                 auc.itemId = auction.item.id;
                                 auc.buyout = auction.buyout;
                                 auc.quantity = auction.quantity;
                                 auc.singleBuyout = result;
+                                auc.price = util.getPrice(auction).price;
+                                auc.singlePrice = util.getPrice(auction).singlePrice;
                                 auctionsReduced.push(auc);
                             });
                             
                             /** get lowest singlebuyout */
-                             // There's no real number bigger than plus Infinity
-                                var lowest = Number.POSITIVE_INFINITY;
-                                //var highest = Number.NEGATIVE_INFINITY;
+                                var lowest = Number.POSITIVE_INFINITY; // There's no real number bigger than plus Infinity
+                                //var highest = Number.NEGATIVE_INFINITY; 
                                 var tmp;
                                 for (var i=auctionsReduced.length-1; i>=0; i--) {
                                     tmp = auctionsReduced[i].singleBuyout;
                                     if (tmp < lowest) lowest = tmp;
                                     //if (tmp > highest) highest = tmp;
                                 }
-                                //console.log(lowest);
                                 let lowestAuction = auctionsReduced.filter(a => {
                                     return a.singleBuyout === lowest
                                   })
-                                //console.log(lowestAuction);
                                 auctionsReduced.sort((a,b) => (a.singleBuyout > b.singleBuyout) ? 1 : ((b.singleBuyout > a.singleBuyout) ? -1 : 0));
-                                //console.log(auctionsReduced);
-
 
                             // res.write(`<p>${count_auctions} Auktionen</p>`);
                             /** comment out res.send() for ending write / infinite page loading (ejs?) */

@@ -26,38 +26,18 @@
     <tr><td><hr></td></tr>
     <tr><td>Quantity</td><td>buyout</td><td>single buyout</td></tr>
 <% 
-reverse = (str) => {
-    if (str === "")
-        return "";
-    else
-        return reverse(str.substr(1)) + str.charAt(0);
-}
+
     let cost; 
     auctionsReduced.forEach(function(auction){
 %>
 <tr>
     <td><%= auction.quantity %></td>
                     <%
-                    let auction_buyout = JSON.stringify(auction.buyout);
-                    let auction_buyout_single =  JSON.stringify(Math.floor(auction_buyout / auction.quantity));
-                    let gold,silver,copper,gold_single,silver_single,copper_single;
-                    if(auction_buyout > 0) {
-
-                            auction_buyout_single = reverse(auction_buyout_single);
-                            gold_single = reverse(auction_buyout_single.slice(4));
-                            silver_single = reverse(auction_buyout_single.slice(2,4));
-                            copper_single = reverse(auction_buyout_single.slice(0,2));
-
-                        auction_buyout = reverse(auction_buyout);
-                        gold = reverse(auction_buyout.slice(4)); 
-                        silver = reverse(auction_buyout.slice(2,4)); 
-                        copper = reverse(auction_buyout.slice(0,2)); 
                     %>
-                    <td><%= gold %>g <%= silver %>s <%= copper %>c</td>
+                    <td><%= auction.price.gold %>g <%= auction.price.silver %>s <%= auction.price.copper %>c</td>
+                    <td><%= auction.singlePrice.gold %>g <%= auction.singlePrice.silver %>s <%= auction.singlePrice.copper %>c</td>
 
-                    <td><%= gold_single %>g <%= silver_single %>s <%= copper_single %>c</td>
 
-        <% } %>
 </tr>
 <% }) %>
 </table>
