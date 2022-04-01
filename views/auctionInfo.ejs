@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <script src="/js/functions.js"></script>
+    <style>
+        table {
+            text-align: right;
+        }
+    </style>
+</head>
+<body>
+<p style="font-style:italic">Letztes Update: <%= lastModified %></p>
+<h1></h1>
+<script>
+    let cost;
+</script>
+<table>
+    <!-- TODO: Lowest Price ? -->
+    <tr><td>Lowest price: </td><td></td></tr>
+    <tr><td>Total price: </td><td></td></tr>
+    <tr><td>Quantity: </td><td></td></tr>
+    <tr><td>Number of Auctions: </td><td></td></tr>
+    <tr><td><hr></td></tr>
+</table>
+
+<table>
+    <tr><td>Item Name</td><td>Item ID</td><td>Quantity</td><td>Total Price</td><td>Single Price</td></tr>
+    <% auctions.forEach(function(auction){ %>
+    <tr>
+        <td><%= auction.item.name %>&nbsp;</td>
+        <td><%= auction.item.id %>&nbsp;</td>               
+        <td><%= auction.quantity %>&nbsp;</td>
+        <td><%= auction.price.gold %>g <%= auction.price.silver %>s <%= auction.price.copper %>c </td>
+        <td><%= auction.singlePrice.gold %>g <%= auction.singlePrice.silver %>s <%= auction.singlePrice.copper %>c</td>
+    </tr>
+    <% }) %>
+</table>
+
+</body>
+</html>
