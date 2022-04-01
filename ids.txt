@@ -2,18 +2,18 @@
 22794 Teufelslotus
 22793 Manadistel
 
-28590 Fläschchen des blendenden Lichts
+22861 Fläschchen des blendenden Lichts
 22791 Netherblüte
 
-28588 Fläschchen der mächtigen Wiederherstellung
+22853 Fläschchen der mächtigen Wiederherstellung
 22786 Traumwinde
 
-28587 Fläschchen der Stärkung
+22851 Fläschchen der Stärkung
 22790 Urflechte
 
-28589 Fläschchen des unerbittlichen Angriffs
+22854 Fläschchen des unerbittlichen Angriffs
 22789 Terozapfen
 
-28591 Fläschchen des reinen Todes
+22866 Fläschchen des reinen Todes
 22792 Alptraumranke
 
