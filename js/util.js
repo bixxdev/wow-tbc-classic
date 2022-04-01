@@ -9,9 +9,9 @@ convertDate = (date) => {
  * should only be used in getPrice()
  */
 slicePrice = (num, numLength) => {
-    const gold = (num >= 5) ? num.slice( 0, -4 ) : '0'; //num.slice( 0, -4 );
-    const silver = (num >= 3) ? num.slice( (numLength-4), -2 ) : '00'; //num.slice( (numLength-4), -2 );
-    const copper = (num > 0) ? num.slice( (numLength-2) ) : '00'; //num.slice( (numLength-2) );
+    const gold = (numLength >= 5) ? num.slice( 0, -4 ) : '0'; //num.slice( 0, -4 );
+    const silver = (numLength >= 3) ? num.slice( (numLength-4), -2 ) : '00'; //num.slice( (numLength-4), -2 );
+    const copper = (numLength > 0) ? num.slice( (numLength-2) ) : '00'; //num.slice( (numLength-2) );
     return {gold, silver, copper};
 }
 
@@ -29,6 +29,10 @@ getPrice = (auction) => {
     const singlePrice = slicePrice(singleBuyoutString, singleBuyoutLength);
     return {price, singlePrice};
 }
+
+/**
+ * TODO: getLowestPrice
+ */
 
 module.exports = { 
     convertDate,
