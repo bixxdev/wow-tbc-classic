@@ -27,7 +27,7 @@
 app.use('/js', express.static(__dirname + '/js'));
 
 // in progress / TEST
-const requestAuctions = require(__dirname + '/js/request.js');
+// const requestAuctions = require(__dirname + '/js/request.js');
 let axiosFN = require(__dirname + '/js/axios.js');
 const token = axiosFN.getAccessToken(clientID, clientSecret);
 
@@ -61,12 +61,11 @@ app.route("/")
         .catch(error => console.log("Final Execution Error",error));
     }) */
     .post( (req,res) => {
-        const itemIDs = [22794,22793,22861,22791,22853,22786,22851,22790,22854,22789,22866,22792]; // reference @ ids.txt
         // let itemInfo, auctionInfo;
         token
         .then(async response => {
             // itemInfo = await axiosFN.getItemInfo(response, itemIDs);
-            let auctionInfo = await axiosFN.getAuctionInfo(response, itemIDs);
+            let auctionInfo = await axiosFN.getAuctionInfo(response, util.itemIDs);
 
             res.render('auctionInfo', {
                     // itemInfo,

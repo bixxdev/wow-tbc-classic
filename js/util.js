@@ -1,3 +1,6 @@
+/** set of item IDs */
+const itemIDs = [22794,22793,22861,22791,22853,22786,22851,22790,22854,22789,22866,22792]; // reference @ ids.txt
+
 /** Convert time of latest data modification from api */
 convertDate = (date) => {
     let options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: 'numeric', minute: 'numeric'};
@@ -34,7 +37,8 @@ getPrice = (auction) => {
  * TODO: getLowestPrice
  */
 
-module.exports = { 
+module.exports = {
+    itemIDs,
     convertDate,
     getPrice,
 };
