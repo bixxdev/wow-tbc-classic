@@ -1,6 +1,6 @@
 const util = require(__dirname + "/util.js");
 
-let requestAuctions = (req,res,https,axios,clientId,clientSecret) => {
+let requestAuctions = async (req,res,https,axios,clientId,clientSecret) => {
 
         const server = "4745"; //Transcendence
         const auctionhouse = "6"; //A:2, H:6, S:7
@@ -8,7 +8,7 @@ let requestAuctions = (req,res,https,axios,clientId,clientSecret) => {
         const namespace_static = "static-classic-eu";
         const locale = "de_DE";
         const item_ID = parseInt(req.body.itemID, 10); // FormInput: parseInt für eine exakte Typenabfrage im Array/Objekt
-        const alchemy_IDs = [22794,22793,28590,22791,28588,22786,28587,22790,28589,22789,28591,22792]; // reference @ ids.txt
+        const alchemy_IDs = [22794,22793,22861,22791,22853,22786,22851,22790,22854,22789,22866,22792]; // reference @ ids.txt
         /** 
          * TODO:
          * 1. array of objects über GET ITEM INFO
@@ -37,32 +37,43 @@ let requestAuctions = (req,res,https,axios,clientId,clientSecret) => {
         },()=>{console.log("end request");})
         .then( resp => {
             access_token = resp.data.access_token;
-            console.log(access_token);
+            // console.log(access_token);
             auctionURL = `https://eu.api.blizzard.com/data/wow/connected-realm/${server}/auctions/${auctionhouse}?namespace=${namespace_dynamic}&locale=${locale}&access_token=${access_token}`;
-            itemURL = `https://eu.api.blizzard.com/data/wow/item/${item_ID}?namespace=${namespace_static}&locale=${locale}&access_token=${access_token}`;
-       
-            /** GET ITEM INFO */
-            https.get(itemURL, response => {
-                switch (response.statusCode) {
-                    case 200:
-                        console.log(`GET ITEM INFO ${response.statusCode}`);
-                        let body = '';
-                        response.on("data", function(data){
-                            body += data;
-                        })
-                        response.on('end', function(){
-                            const parsedResponse = JSON.parse(body);
-                            item_name = parsedResponse.name;
-                        });
-                        break;
-                    case 401:
-                        console.log(`GET ITEM INFO ${response.statusCode}: renew access_token`);
-                        break;
-                    default:
-                        console.log(`GET ITEM INFO ${response.statusCode}`);
-                }
-                console.log("___________________ GET ITEM INFO END ___________________");
-            })
+            // itemURL = `https://eu.api.blizzard.com/data/wow/item/${item_ID}?namespace=${namespace_static}&locale=${locale}&access_token=${access_token}`;
+
+            let requestedItems = []
+            // loop alchemy_IDs.length times and add infos into object or array
+            for ( let i=0; i<alchemy_IDs.length; i++ ) {
+                console.log(alchemy_IDs.length, i, alchemy_IDs[i]);
+                itemURL = `https://eu.api.blizzard.com/data/wow/item/${alchemy_IDs[i]}?namespace=${namespace_static}&locale=${locale}&access_token=${access_token}`;
+
+                /** GET ITEM INFO */
+                https.get(itemURL, response => {
+                    switch (response.statusCode) {
+                        case 200:
+                            console.log(`GET ITEM INFO ${response.statusCode}`);
+                            let body = '';
+                            response.on("data", function(data){
+                                body += data;
+                            })
+                            response.on('end', function(){
+                                const parsedResponse = JSON.parse(body);
+                                item_name = parsedResponse.name;
+                                requestedItems.push(item_name);
+                            });
+                            if (i === alchemy_IDs.length-1) {
+                                console.log(requestedItems, i);
+                            }
+                            break;
+                        case 401:
+                            console.log(`GET ITEM INFO ${response.statusCode}: renew access_token`);
+                            break;
+                        default:
+                            console.log(`GET ITEM INFO ${response.statusCode}`);
+                    }
+                    console.log(`___________________ GET ITEM INFO END ___________________${i}`);
+                })
+            }
   
             /** GET AUCTION INFO */
             https.get(auctionURL, response => {
