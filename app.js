@@ -7,7 +7,7 @@
     const router = express.Router();
 /* dotenv file, access_token */
     require('dotenv').config()
-    const clientId = process.env.CLIENTID;
+    const clientID = process.env.CLIENTID;
     const clientSecret = process.env.CLIENTSECRET;
     const request = require('request');
 /* Form Input */
@@ -28,6 +28,8 @@ app.use('/js', express.static(__dirname + '/js'));
 
 // in progress / TEST
 const requestAuctions = require(__dirname + '/js/request.js');
+let axiosFN = require(__dirname + '/js/axios.js');
+const token = axiosFN.getAccessToken(clientID, clientSecret);
 
 app.route("/")
     .get( (req,res) => {
@@ -35,8 +37,43 @@ app.route("/")
         /** ejs */
         res.render('index');
     })
+    /* .post( (req,res) => {
+        // requestAuctions(req,res,https,axios,clientId,clientSecret);
+
+        const itemID = [22794];//parseInt(req.body.itemID, 10); // FormInput: parseInt für eine exakte Typenabfrage im Array/Objekt
+        const itemIDs = [22794,22793,22861,22791,22853,22786,22851,22790,22854,22789,22866,22792]; // reference @ ids.txt
+
+        token
+        .then(async response => { 
+            for(let i=0; i<itemIDs.length; i++) {
+                await axiosFN.getItemInfo(response, itemIDs[i], i) 
+            }
+            auctionInfo = await axiosFN.getAuctionInfo(response, itemID);
+            console.log('lastmodified: '+auctionInfo.lastModified);
+            return auctionInfo;
+        })
+        .then( response => {
+            
+            res.render('auctionInfo', {
+                lastModified: response.lastModified,
+            });
+        } )
+        .catch(error => console.log("Final Execution Error",error));
+    }) */
     .post( (req,res) => {
-        requestAuctions(req,res,https,axios,clientId,clientSecret);
+        const itemIDs = [22794,22793,22861,22791,22853,22786,22851,22790,22854,22789,22866,22792]; // reference @ ids.txt
+        // let itemInfo, auctionInfo;
+        token
+        .then(async response => {
+            // itemInfo = await axiosFN.getItemInfo(response, itemIDs);
+            let auctionInfo = await axiosFN.getAuctionInfo(response, itemIDs);
+
+            res.render('auctionInfo', {
+                    // itemInfo,
+                    auctions: auctionInfo.auctions,
+                    lastModified: auctionInfo.lastModified.toString(),
+                });   
+        })
     })
 
 /*
