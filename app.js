@@ -22,54 +22,55 @@
     app.set("view engine", "ejs");
 /* axios, renew token */
     const axios = require("axios");
-
+    let axiosFN = require(__dirname + '/js/axios.js');
 /** js ordner bereitstellen */
 app.use('/js', express.static(__dirname + '/js'));
 
-// in progress / TEST
-// const requestAuctions = require(__dirname + '/js/request.js');
-let axiosFN = require(__dirname + '/js/axios.js');
-const token = axiosFN.getAccessToken(clientID, clientSecret);
 
 app.route("/")
     .get( (req,res) => {
+        console.log("GET /");
         //res.sendFile(path.join(__dirname+'/html/index.html'));
         /** ejs */
         res.render('index');
     })
-    /* .post( (req,res) => {
-        // requestAuctions(req,res,https,axios,clientId,clientSecret);
 
-        const itemID = [22794];//parseInt(req.body.itemID, 10); // FormInput: parseInt für eine exakte Typenabfrage im Array/Objekt
-        const itemIDs = [22794,22793,22861,22791,22853,22786,22851,22790,22854,22789,22866,22792]; // reference @ ids.txt
-
-        token
-        .then(async response => { 
-            for(let i=0; i<itemIDs.length; i++) {
-                await axiosFN.getItemInfo(response, itemIDs[i], i) 
-            }
-            auctionInfo = await axiosFN.getAuctionInfo(response, itemID);
-            console.log('lastmodified: '+auctionInfo.lastModified);
-            return auctionInfo;
-        })
-        .then( response => {
-            
-            res.render('auctionInfo', {
-                lastModified: response.lastModified,
-            });
-        } )
-        .catch(error => console.log("Final Execution Error",error));
-    }) */
+app.route("/auctions/item")
     .post( (req,res) => {
-        // let itemInfo, auctionInfo;
-        token
+        var input = req.body.itemID;
+        console.log("POST /auctions/item",input);
+        axiosFN.getAccessToken(clientID, clientSecret)
         .then(async response => {
-            // itemInfo = await axiosFN.getItemInfo(response, itemIDs);
-            let auctionInfo = await axiosFN.getAuctionInfo(response, util.itemIDs);
+            let auctionInfo = await axiosFN.getAuctionInfo(response, input, false);
+            try {
+                /** check if response is empty */
+                if (auctionInfo.length === 0) {
+                    res.render('auctionItem');
+                    return;
+                } else {
+                    res.render('auctionItem', {
+                            auctions: auctionInfo.auctions,
+                            lastModified: auctionInfo.lastModified.toString(),
+                        });   
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        })
+        .catch(function (error) {
+            console.log(error);
+        });
+    })
+
+app.route("/auctions/alchemy")
+    .post( (req,res) => {
+        console.log("POST /auctions/alchemy");
+        axiosFN.getAccessToken(clientID, clientSecret)
+        .then(async response => {
+            let auctionInfo = await axiosFN.getAuctionInfo(response, util.itemIDs, true);
 
             try {
-                res.render('auctionInfo', {
-                        // itemInfo,
+                res.render('auctionProfession', {
                         auctions: auctionInfo.auctions,
                         cheapestAuctions: auctionInfo.cheapestAuctions,
                         lastModified: auctionInfo.lastModified.toString(),
@@ -85,12 +86,6 @@ app.route("/")
         })
     })
 
-/*
-router.get("/", function(req,res){
-    //res.send("Server is running.");
-    //res.sendFile(path.join(__dirname+'/html/index.html'));
-})
-*/
 app.use('/', router)
 app.listen(process.env.PORT || 3000, function(){
     console.log("Server is up and running on port 3000.");
