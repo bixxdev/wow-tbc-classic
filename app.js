@@ -67,11 +67,21 @@ app.route("/")
             // itemInfo = await axiosFN.getItemInfo(response, itemIDs);
             let auctionInfo = await axiosFN.getAuctionInfo(response, util.itemIDs);
 
-            res.render('auctionInfo', {
-                    // itemInfo,
-                    auctions: auctionInfo.auctions,
-                    lastModified: auctionInfo.lastModified.toString(),
-                });   
+            try {
+                res.render('auctionInfo', {
+                        // itemInfo,
+                        auctions: auctionInfo.auctions,
+                        cheapestAuctions: auctionInfo.cheapestAuctions,
+                        lastModified: auctionInfo.lastModified.toString(),
+                        profit_flask_zm: auctionInfo.profit_flask_zm, 
+                        profit_flask_mp5: auctionInfo.profit_flask_mp5, 
+                        profit_flask_hp: auctionInfo.profit_flask_hp, 
+                        profit_flask_ak: auctionInfo.profit_flask_ak, 
+                        profit_flask_sff: auctionInfo.profit_flask_sff, 
+                    });   
+            } catch (error) {
+                console.log(error);
+            }
         })
     })
 

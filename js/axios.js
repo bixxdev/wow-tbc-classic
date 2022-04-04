@@ -1,5 +1,5 @@
-const https = require("https");
 const util = require(__dirname + "/util.js");
+const https = require("https");
 const axios = require('axios').default;
 const server = "4745"; //Transcendence
 const auctionhouse = "6"; //A:2, H:6, S:7
@@ -51,6 +51,7 @@ const getItemInfo = async (accessToken, itemIDs) => {
 
 const getAuctionInfo = async (accessToken, itemIDs) => {
     let auctions;
+    let cheapestAuctions;
     console.log('getAuctionInfo');
     const auctionURL = `https://eu.api.blizzard.com/data/wow/connected-realm/${server}/auctions/${auctionhouse}?namespace=${namespace_dynamic}&locale=${locale}&access_token=${accessToken.toString()}`;
     const itemInfo = await getItemInfo(accessToken, itemIDs);
@@ -63,24 +64,49 @@ const getAuctionInfo = async (accessToken, itemIDs) => {
             return itemIDs.includes(auction.item.id);
         });
         /** redurce entries in objects to needed values */
-        auctions = auctions.map(auc => ({ item: { id: auc.item.id }, bid: auc.bid, buyout: auc.buyout, quantity: auc.quantity }));
+        auctions = auctions.map(auc => ({ item: { id: auc.item.id }, quantity: auc.quantity, bid: auc.bid, buyout: { total: auc.buyout, single: util.getSingle(auc.buyout,auc.quantity), isCheapest: false } }));
               
         /** for every item loop auctions array, check if it matches item, add item name to object */
         for (const key in itemInfo) {
-            // console.log('key '+key, 'itemInfo[key] '+JSON.stringify(itemInfo[key].id));    
+            // key = 0, 1, 2, 3, 4...
             for (let i = 0; i < auctions.length; i++) {
                 if (auctions[i].item.id == JSON.stringify(itemInfo[key].id)) {
                     auctions[i].item["name"] = itemInfo[key].name;
-                    auctions[i]["price"] = util.getPrice(auctions[i]).price;
-                    auctions[i]["singlePrice"] = util.getPrice(auctions[i]).singlePrice;
+                    auctions[i]["price"] = {};
+                    auctions[i].price["total"] = util.getPrice(auctions[i]).price;
+                    auctions[i].price["single"] = util.getPrice(auctions[i]).singlePrice;
                 }
             }
         }
 
-        /** sort by ID then quantity then buyout */
-        auctions.sort((a, b) => (a.item.id > b.item.id) ? 1 : (a.item.id === b.item.id) ? ((a.quantity > b.quantity) ? 1 : (a.quantity === b.quantity) ? ((a.buyout > b.buyout) ? 1 : -1) : -1 ) : -1 )
-        console.log(auctions);
+        /** set isCheapest */
+        util.setCheapest(auctions,util.itemIDs);
+        cheapestAuctions = auctions.filter(auction => auction.buyout.isCheapest === true);
+        // console.log(cheapestAuctions);
+        /** 
+         * Calculate flask profit 
+         * 1x 22794 Teufelslotus
+         * 3x 22793 Manadistel
+         * 7x ...
+            * 22791 Netherblüte 22861 Fläschchen des blendenden Lichts 
+            * 22786 Traumwinde 22853 Fläschchen der mächtigen Wiederherstellung 
+            * 22790 Urflechte 22851 Fläschchen der Stärkung 
+            * 22789 Terozapfen 22854 Fläschchen des unerbittlichen Angriffs 
+            * 22792 Alptraumranke 22866 Fläschchen des reinen Todes 
+        * */
+        const profit_flask_zm = calcProfit('flask', cheapestAuctions, 22861);
+        const profit_flask_mp5 = calcProfit('flask', cheapestAuctions, 22853);
+        const profit_flask_hp = calcProfit('flask', cheapestAuctions, 22851);
+        const profit_flask_ak = calcProfit('flask', cheapestAuctions, 22854);
+        const profit_flask_sff = calcProfit('flask', cheapestAuctions, 22866);
 
+        /** sort by ID then buyout.single then quantity */
+        // auctions.sort((a, b) => (a.item.id > b.item.id) ? 1 : (a.item.id === b.item.id) ? ((a.quantity > b.quantity) ? 1 : (a.quantity === b.quantity) ? ((a.buyout.total > b.buyout.total) ? 1 : -1) : -1 ) : -1 )
+        cheapestAuctions.sort((a, b) => (a.item.id > b.item.id) ? 1 : (a.item.id === b.item.id) ? ((a.buyout.single > b.buyout.single) ? 1 : (a.buyout.single === b.buyout.single) ? ((a.quantity > b.quantity) ? 1 : -1) : -1 ) : -1 );
+        auctions.sort((a, b) => (a.item.id > b.item.id) ? 1 : (a.item.id === b.item.id) ? ((a.buyout.single > b.buyout.single) ? 1 : (a.buyout.single === b.buyout.single) ? ((a.quantity > b.quantity) ? 1 : -1) : -1 ) : -1 );
+        // console.log(auctions);
+
+        /** letzte Blizz Update der API */
         const lastModified = util.convertDate(resp.headers['last-modified']);
         console.log(lastModified);
 
@@ -89,7 +115,10 @@ const getAuctionInfo = async (accessToken, itemIDs) => {
          * getAuctionInfo(response, itemIDs).auctions
          * getAuctionInfo(response, itemIDs).lastModified.toString()
          * */
-        return {auctions,lastModified};
+        return { 
+            auctions, cheapestAuctions, lastModified, 
+            profit_flask_zm, profit_flask_mp5, profit_flask_hp, profit_flask_ak, profit_flask_sff 
+        };
     } catch (err) {
         console.error("getItemInfo Error",err);
     }

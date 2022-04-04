@@ -13,11 +13,7 @@
     </style>
 </head>
 <body>
-<p style="font-style:italic">Letztes Update: <%= lastModified %></p>
-<h1></h1>
-<script>
-    let cost;
-</script>
+    <p style="font-style:italic">Letztes Update: <%= lastModified %></p>
 <table>
     <!-- TODO: Lowest Price ? -->
     <tr><td>Lowest price: </td><td></td></tr>
@@ -26,19 +22,35 @@
     <tr><td>Number of Auctions: </td><td></td></tr>
     <tr><td><hr></td></tr>
 </table>
-
+<br>
+<h2>Possible Profit</h2>
 <table>
-    <tr><td>Item Name</td><td>Item ID</td><td>Quantity</td><td>Total Price</td><td>Single Price</td></tr>
-    <% auctions.forEach(function(auction){ %>
+    <tr><td>Fläschchen des blendenden Lichts </td><td><%= profit_flask_zm.gold %>g <%= profit_flask_zm.silver %>s <%= profit_flask_zm.copper %>c</td></tr>
+    <tr><td>Fläschchen der mächtigen Wiederherstellung </td><td><%= profit_flask_mp5.gold %>g <%= profit_flask_mp5.silver %>s <%= profit_flask_mp5.copper %>c</td></tr>
+    <tr><td>Fläschchen der Stärkung </td><td><%= profit_flask_hp.gold %>g <%= profit_flask_hp.silver %>s <%= profit_flask_hp.copper %>c</td></tr>
+    <tr><td>Fläschchen des unerbittlichen Angriffs </td><td><%= profit_flask_ak.gold %>g <%= profit_flask_ak.silver %>s <%= profit_flask_ak.copper %>c</td></tr>
+    <tr><td>Fläschchen des reinen Todes </td><td><%= profit_flask_sff.gold %>g <%= profit_flask_sff.silver %>s <%= profit_flask_sff.copper %>c</td></tr>
+</table>
+<br>
+<h2>Auctions</h2>
+<table>
+    <tr><td>Item Name</td><td>Item ID</td><td>Quantity</td><td>Total Buyout</td><td>Single Buyout</td><td>Total Price</td><td>Single Price</td></tr>
+    <% cheapestAuctions.forEach(function(auction){ %>
     <tr>
         <td><%= auction.item.name %>&nbsp;</td>
         <td><%= auction.item.id %>&nbsp;</td>               
         <td><%= auction.quantity %>&nbsp;</td>
-        <td><%= auction.price.gold %>g <%= auction.price.silver %>s <%= auction.price.copper %>c </td>
-        <td><%= auction.singlePrice.gold %>g <%= auction.singlePrice.silver %>s <%= auction.singlePrice.copper %>c</td>
+        <td><%= auction.buyout.total %>&nbsp;</td>               
+        <td><%= auction.buyout.single %>&nbsp;</td>
+        <td><%= auction.price.total.gold %>g <%= auction.price.total.silver %>s <%= auction.price.total.copper %>c </td>
+        <td><%= auction.price.single.gold %>g <%= auction.price.single.silver %>s <%= auction.price.single.copper %>c</td>
+        <% if(auction.buyout.isCheapest == true) { %>
+            <td>*</td>
+        <% } %>
     </tr>
     <% }) %>
 </table>
+
 
 </body>
 </html>
