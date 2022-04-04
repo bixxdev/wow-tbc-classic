@@ -10,6 +10,16 @@ convertDate = (date) => {
 }
 
 /**
+ * Generate API Request URL
+ */
+requestItemURL = (itemID, namespace_static, locale, accessToken) => {
+    return `https://eu.api.blizzard.com/data/wow/item/${itemID}?namespace=${namespace_static}&locale=${locale}&access_token=${accessToken}`
+}
+requestAuctionURL = (server, auctionhouse, namespace_dynamic, locale, accessToken) => {
+    return `https://eu.api.blizzard.com/data/wow/connected-realm/${server}/auctions/${auctionhouse}?namespace=${namespace_dynamic}&locale=${locale}&access_token=${accessToken.toString()}`;
+}
+
+/**
  * slicePrice converts a number (auction buyout) and returns three numbers: gold, silver, copper
  * should only be used in getPrice()
  */
@@ -80,7 +90,7 @@ setCheapest = (auctions, items) => {
 calcProfit = (type, lowestPriceItems, toBeCrafted) => {
     let sellingPrice;
     let sellingPriceWithFee;
-    if (type === "flask") {
+    if (type === 3) { // 3: flask
         const item_1 = lowestPriceItems.find(element => element.item.id === 22794).buyout.single; // Teufelslotus
         const item_2 = lowestPriceItems.find(element => element.item.id === 22793).buyout.single; // Manadistel
         let item_3;
@@ -108,7 +118,7 @@ calcProfit = (type, lowestPriceItems, toBeCrafted) => {
         const totalComponentsPrice = item_1 + (3*item_2) + (7*item_3);
         profit = Math.floor( (flaskPrice*0.95) - totalComponentsPrice );
         profit = slicePrice(profit.toString(),profit.toString().length);
-        console.log(item_1, item_2, item_3, flaskPrice, profit, toBeCrafted);
+        // console.log(item_1, item_2, item_3, flaskPrice, profit, toBeCrafted);
     }
     return profit;
 }
@@ -116,6 +126,8 @@ calcProfit = (type, lowestPriceItems, toBeCrafted) => {
 module.exports = {
     itemIDs,
     convertDate,
+    requestItemURL,
+    requestAuctionURL,
     getPrice,
     getSingle,
     setCheapest,
