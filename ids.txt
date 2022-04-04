@@ -17,3 +17,5 @@
 22866 Fläschchen des reinen Todes
 22792 Alptraumranke
 
+# item_subclass.id
+# 3: Fläschchen, 9: Kräuter
