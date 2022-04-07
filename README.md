@@ -13,6 +13,8 @@ copy + paste it into .env file
 [WoW Classic Game Data API](https://develop.battle.net/documentation/world-of-warcraft-classic/game-data-apis)
 
 Axios Docs [here](https://axios-http.com/docs/intro)
+- Promise based HTTP client for the browser and server (NodeJS)
+[fetch vs. Axios: Pros & Cons](https://www.atecna.ca/blog/fetch-vs-axios/)
 
 ## Application running on Heroku
 [http://wow-tbc-classic.herokuapp.com/](http://wow-tbc-classic.herokuapp.com/)
