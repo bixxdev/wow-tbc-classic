@@ -10,9 +10,15 @@ App is running on Heroku: [https://wow-tbc-classic.herokuapp.com/](https://wow-t
 
 copy + paste it into .env file
 
+---
+
 [WoW Classic Game Data API](https://develop.battle.net/documentation/world-of-warcraft-classic/game-data-apis)
 
-Axios Docs [here](https://axios-http.com/docs/intro)
+---
+
+## Axios
+
+[Axios Docs](https://axios-http.com/docs/intro)
 
 Promise based HTTP client for the browser and server (NodeJS)
 
