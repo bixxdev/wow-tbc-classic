@@ -4,7 +4,7 @@
 
 `curl -u {client_id}:{client_secret} -d grant_type=client_credentials https://us.battle.net/oauth/token`
 
-*ID und SECRET ohne {} eingeben!*
+*Enter ID and SECRET without {}*
 
 copy + paste it into .env file
 
@@ -16,9 +16,9 @@ copy + paste it into .env file
 
 ## Axios
 
-[Axios Docs](https://axios-http.com/docs/intro)
-
 Promise based HTTP client for the browser and server (NodeJS)
+
+[Axios Docs](https://axios-http.com/docs/intro)
 
 [fetch vs. Axios: Pros & Cons](https://www.atecna.ca/blog/fetch-vs-axios/)
 
