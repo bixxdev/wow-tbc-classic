@@ -1,7 +1,7 @@
 const util = require(__dirname + "/util.js");
 const https = require("https");
 const axios = require('axios').default;
-const server = "4745"; //Transcendence
+const server = "4477"; // "4745"; //Transcendence
 const auctionhouse = "6"; //A:2, H:6, S:7
 const namespace_dynamic = "dynamic-classic-eu";
 const namespace_static = "static-classic-eu";
