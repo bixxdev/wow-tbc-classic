@@ -8,11 +8,13 @@ let requestAuctions = async (req,res,https,axios,clientId,clientSecret) => {
         const namespace_static = "static-classic-eu";
         const locale = "de_DE";
         const item_ID = parseInt(req.body.itemID, 10); // FormInput: parseInt für eine exakte Typenabfrage im Array/Objekt
-        const alchemy_IDs = [22794,22793,22861,22791,22853,22786,22851,22790,22854,22789,22866,22792]; // reference @ ids.txt
+        //const collectionIds = [22794,22793,22861,22791,22853,22786,22851,22790,22854,22789,22866,22792]; // alchemy reference @ ids.txt
+        const collectionIds = [2835,2840,2836,2589,2842,2841,2838,1206,2592,2319,3859,7912,3860,4338,12365,12359,14047,23445,22573,22574,22452,21877,23446,23449,21884]; // jewelcrafting
+
         /** 
          * TODO:
          * 1. array of objects über GET ITEM INFO
-         * 2. auctions reduce auf alchemy_IDs
+         * 2. auctions reduce auf collectionIds
          * 3. ...
          * zusätzlich: wird Unterschied von auctions und auctionsReduces benötigt? reicht nicht auctions und Überschreiben von auctions aus?
          */
@@ -42,10 +44,10 @@ let requestAuctions = async (req,res,https,axios,clientId,clientSecret) => {
             // itemURL = `https://eu.api.blizzard.com/data/wow/item/${item_ID}?namespace=${namespace_static}&locale=${locale}&access_token=${access_token}`;
 
             let requestedItems = []
-            // loop alchemy_IDs.length times and add infos into object or array
-            for ( let i=0; i<alchemy_IDs.length; i++ ) {
-                console.log(alchemy_IDs.length, i, alchemy_IDs[i]);
-                itemURL = `https://eu.api.blizzard.com/data/wow/item/${alchemy_IDs[i]}?namespace=${namespace_static}&locale=${locale}&access_token=${access_token}`;
+            // loop collectionIds.length times and add infos into object or array
+            for ( let i=0; i<collectionIds.length; i++ ) {
+                console.log(collectionIds.length, i, collectionIds[i]);
+                itemURL = `https://eu.api.blizzard.com/data/wow/item/${collectionIds[i]}?namespace=${namespace_static}&locale=${locale}&access_token=${access_token}`;
 
                 /** GET ITEM INFO */
                 https.get(itemURL, response => {
@@ -61,7 +63,7 @@ let requestAuctions = async (req,res,https,axios,clientId,clientSecret) => {
                                 item_name = parsedResponse.name;
                                 requestedItems.push(item_name);
                             });
-                            if (i === alchemy_IDs.length-1) {
+                            if (i === collectionIds.length-1) {
                                 console.log(requestedItems, i);
                             }
                             break;
